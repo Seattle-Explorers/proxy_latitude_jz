@@ -1,16 +1,20 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" type="text/css" href="reservation/style.css">
+    <link rel="stylesheet" type="text/css" href="http://ec2-54-187-151-161.us-west-2.compute.amazonaws.com/style.css" disable>
+    <link rel="stylesheet" type="text/css" href="proxyStyle.css" disable>
     <meta charset="utf-8">
-    <title>"AirBnB"</title>
+    <title>"Latitude"</title>
   </head>
   <body>
-    <div id="container"></div>
-    <div id="booking-component"></div>
+    <div id="description"></div>
+    <div class='reservationSection'>
+      <div id="calendar-component"></div>
+      <div id="booking-component"></div>
+    </div>
     <div id="reviews"></div>
     <script src="/description/main.js"></script>
-    <script src="/reservation/bundle.js"></script>
+    <script src="/:id/reservation/reservationBundle.js"></script>
     <script src="/review/bundle.js"></script>
   </body>
 </html>
