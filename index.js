@@ -1,40 +1,42 @@
+require('dotenv').config();
 const Console = require('console');
 const path = require('path');
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-// have a server that takes various different api calls:
-// localhost:8080/description/:id
-// localhost:8080/reviews/api/:id
-// localhost:8080/reservations/api/:id
-// and translates them into calls on different ports where the backends are
-// localhost:3000/description/:id
-// localhost:3001/description/:id
-// localhost:3002/reservations/:id
-
 const port = process.env.PORT || 8080;
 
-const proxyOptions = {
-  target: 'localhost',
+const resOptions = {
+  target: process.env.RES_HOST || 'localhost:3001',
   changeOrigin: true,
-  router: {
-    'localhost:8080/api/description': 'http://localhost:3000',
-    'localhost:8080/api/reviews': 'http://localhost:3002',
-    'localhost:8080/api/reservation': 'http://localhost:3001',
-  },
 };
 
-const proxy = createProxyMiddleware(proxyOptions);
-const app = express();
+const descOptions = {
+  target: process.env.DESC_HOST || 'localhost: 3000',
+  changeOrigin: true,
+};
+
+const revOptions = {
+  target: process.env.REV_HOST || 'localhost: 3002',
+  changeOrigin: true,
+};
+
 const proxyPath = path.join(__dirname);
-const descPath = path.join(__dirname, '..', 'FEC-Description-Component', 'client', 'dist');
-const revPath = path.join(__dirname, '..', 'FEC-Reviews-Component', 'client', 'public');
-const resPath = path.join(__dirname, '..', 'FEC-Reservation-Component', 'client', 'dist');
-app.use('/api', proxy);
-app.use('/', express.static(proxyPath));
-app.use('/description', express.static(descPath));
-app.use('/reservation', express.static(resPath));
-app.use('/review', express.static(revPath));
+const proxyRes = createProxyMiddleware(resOptions);
+const proxyDesc = createProxyMiddleware(descOptions);
+const proxyRev = createProxyMiddleware(revOptions);
+
+const app = express();
+app.use('/:id', express.static(proxyPath));
+
+app.get('/:id/reservation/reservationBundle.js', proxyRes);
+app.get('/api/reservation/:id', proxyRes);
+
+app.get('/description/main.js', proxyDesc);
+app.get('/api/description/:id', proxyDesc);
+
+app.get('/review/bundle.js', proxyRev);
+app.get('/api/description/:id', proxyRev);
 
 app.listen(port, () => {
   Console.log(`proxy listening on port ${port}`);
